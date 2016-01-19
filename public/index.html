@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SocketShips</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.css">
+  <style>
+    .board {
+      width: 100%;
+      line-height: 0;
+      text-align: center !important;
+    }
+  </style>
+  <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    var socket = io();
+    var myTurn = false;
+
+    function bump(id, n) {
+      $(id).html(function (i, val) {
+        return n ? n : parseInt(val) + 1;
+      });
+    }
+
+    function unBump(id) {
+      $(id).html(function (i, val) {
+        return parseInt(val) - 1;
+      });
+    }
+
+    socket.on('welcome', function (msg) {
+      bump('#total', msg.total);
+      bump('#online', msg.online);
+    });
+
+    socket.on('playerJoin', function () {
+      bump('#online');
+      bump('#total');
+    });
+
+    socket.on('playerLeft', function () {
+      unBump('#online');
+    });
+
+    socket.on('turn', function (data) {
+      console.log(data);
+    });
+
+    socket.on('newGame', function (data) {
+      console.log(data);
+    });
+
+    function shoot(x, y) {
+      socket.emit('shoot', {x: x, y: y});
+    }
+
+    function postName() {
+      socket.emit('ready', document.getElementById('name').value);
+      document.getElementById('start').style.display = 'none';
+      document.getElementById('alert').style.display = 'block';
+    }
+
+  </script>
+</head>
+<body>
+<div class="ui container">
+  <h1 class="ui header center">Battleships</h1>
+  <div class="text-center">
+    <div class="ui horizontal statistic">
+      <div class="value" id="online"></div>
+      <div class="label">Online</div>
+    </div>
+    <div class="ui horizontal statistic">
+      <div class="value" id="total"></div>
+      <div class="label">total</div>
+    </div>
+  </div>
+  <div id="start" class="ui segment" style="max-width: 200px; text-align: center; margin: auto;">
+    <form class="ui form">
+      <div class="field">
+        <label>Player Name</label>
+        <input name="name" id="name" type="text" placeholder="e.g. Edward">
+      </div>
+      <button class="fluid ui right labeled icon button primary" type="button" onclick="postName()">
+        <i class="right arrow icon"></i>
+        Find a battle
+      </button>
+    </form>
+  </div>
+  <div class="ui segment" style="min-height: 200px; display: block" id="alert">
+    <div class="ui active">
+      <div class="ui indeterminate text loader">Waiting for another player to join...</div>
+    </div>
+
+    <div class="ui three column grid">
+      <div class="column">
+        <h3 class="ui header">My Board</h3>
+        <table class="board ui celled table">
+          <thead>
+          <tr>
+            <th></th>
+            <th>0</th>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+            <th>8</th>
+            <th>9</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>0</td>
+            <td data-grid-friend="0,0"></td>
+            <td data-grid-friend="1,0"></td>
+            <td data-grid-friend="2,0"></td>
+            <td data-grid-friend="3,0"></td>
+            <td data-grid-friend="4,0"></td>
+            <td data-grid-friend="5,0"></td>
+            <td data-grid-friend="6,0"></td>
+            <td data-grid-friend="7,0"></td>
+            <td data-grid-friend="8,0"></td>
+            <td data-grid-friend="9,0"></td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td data-grid-friend="0,1"></td>
+            <td data-grid-friend="1,1"></td>
+            <td data-grid-friend="2,1"></td>
+            <td data-grid-friend="3,1"></td>
+            <td data-grid-friend="4,1"></td>
+            <td data-grid-friend="5,1"></td>
+            <td data-grid-friend="6,1"></td>
+            <td data-grid-friend="7,1"></td>
+            <td data-grid-friend="8,1"></td>
+            <td data-grid-friend="9,1"></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td data-grid-friend="0,2"></td>
+            <td data-grid-friend="1,2"></td>
+            <td data-grid-friend="2,2"></td>
+            <td data-grid-friend="3,2"></td>
+            <td data-grid-friend="4,2"></td>
+            <td data-grid-friend="5,2"></td>
+            <td data-grid-friend="6,2"></td>
+            <td data-grid-friend="7,2"></td>
+            <td data-grid-friend="8,2"></td>
+            <td data-grid-friend="9,2"></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td data-grid-friend="0,3"></td>
+            <td data-grid-friend="1,3"></td>
+            <td data-grid-friend="2,3"></td>
+            <td data-grid-friend="3,3"></td>
+            <td data-grid-friend="4,3"></td>
+            <td data-grid-friend="5,3"></td>
+            <td data-grid-friend="6,3"></td>
+            <td data-grid-friend="7,3"></td>
+            <td data-grid-friend="8,3"></td>
+            <td data-grid-friend="9,3"></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td data-grid-friend="0,4"></td>
+            <td data-grid-friend="1,4"></td>
+            <td data-grid-friend="2,4"></td>
+            <td data-grid-friend="3,4"></td>
+            <td data-grid-friend="4,4"></td>
+            <td data-grid-friend="5,4"></td>
+            <td data-grid-friend="6,4"></td>
+            <td data-grid-friend="7,4"></td>
+            <td data-grid-friend="8,4"></td>
+            <td data-grid-friend="9,4"></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td data-grid-friend="0,5"></td>
+            <td data-grid-friend="1,5"></td>
+            <td data-grid-friend="2,5"></td>
+            <td data-grid-friend="3,5"></td>
+            <td data-grid-friend="4,5"></td>
+            <td data-grid-friend="5,5"></td>
+            <td data-grid-friend="6,5"></td>
+            <td data-grid-friend="7,5"></td>
+            <td data-grid-friend="8,5"></td>
+            <td data-grid-friend="9,5"></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td data-grid-friend="0,6"></td>
+            <td data-grid-friend="1,6"></td>
+            <td data-grid-friend="2,6"></td>
+            <td data-grid-friend="3,6"></td>
+            <td data-grid-friend="4,6"></td>
+            <td data-grid-friend="5,6"></td>
+            <td data-grid-friend="6,6"></td>
+            <td data-grid-friend="7,6"></td>
+            <td data-grid-friend="8,6"></td>
+            <td data-grid-friend="9,6"></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td data-grid-friend="0,7"></td>
+            <td data-grid-friend="1,7"></td>
+            <td data-grid-friend="2,7"></td>
+            <td data-grid-friend="3,7"></td>
+            <td data-grid-friend="4,7"></td>
+            <td data-grid-friend="5,7"></td>
+            <td data-grid-friend="6,7"></td>
+            <td data-grid-friend="7,7"></td>
+            <td data-grid-friend="8,7"></td>
+            <td data-grid-friend="9,7"></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td data-grid-friend="0,8"></td>
+            <td data-grid-friend="1,8"></td>
+            <td data-grid-friend="2,8"></td>
+            <td data-grid-friend="3,8"></td>
+            <td data-grid-friend="4,8"></td>
+            <td data-grid-friend="5,8"></td>
+            <td data-grid-friend="6,8"></td>
+            <td data-grid-friend="7,8"></td>
+            <td data-grid-friend="8,8"></td>
+            <td data-grid-friend="9,8"></td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td data-grid-friend="0,9"></td>
+            <td data-grid-friend="1,9"></td>
+            <td data-grid-friend="2,9"></td>
+            <td data-grid-friend="3,9"></td>
+            <td data-grid-friend="4,9"></td>
+            <td data-grid-friend="5,9"></td>
+            <td data-grid-friend="6,9"></td>
+            <td data-grid-friend="7,9"></td>
+            <td data-grid-friend="8,9"></td>
+            <td data-grid-friend="9,9"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="column">
+        <h3 class="ui header"><span id="opponents">Opponent</span>'s Board</h3>
+        <table class="board ui celled table">
+          <thead>
+          <tr>
+            <th></th>
+            <th>0</th>
+            <th>1</th>
+            <th>2</th>
+            <th>3</th>
+            <th>4</th>
+            <th>5</th>
+            <th>6</th>
+            <th>7</th>
+            <th>8</th>
+            <th>9</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>0</td>
+            <td data-grid-enemy="0,0" onclick="shoot(0,0)"></td>
+            <td data-grid-enemy="1,0" onclick="shoot(1,0)"></td>
+            <td data-grid-enemy="2,0" onclick="shoot(2,0)"></td>
+            <td data-grid-enemy="3,0" onclick="shoot(3,0)"></td>
+            <td data-grid-enemy="4,0" onclick="shoot(4,0)"></td>
+            <td data-grid-enemy="5,0" onclick="shoot(5,0)"></td>
+            <td data-grid-enemy="6,0" onclick="shoot(6,0)"></td>
+            <td data-grid-enemy="7,0" onclick="shoot(7,0)"></td>
+            <td data-grid-enemy="8,0" onclick="shoot(8,0)"></td>
+            <td data-grid-enemy="9,0" onclick="shoot(9,0)"></td>
+          </tr>
+          <tr>
+            <td>1</td>
+            <td data-grid-enemy="0,1" onclick="shoot(0,1)"></td>
+            <td data-grid-enemy="1,1" onclick="shoot(1,1)"></td>
+            <td data-grid-enemy="2,1" onclick="shoot(2,1)"></td>
+            <td data-grid-enemy="3,1" onclick="shoot(3,1)"></td>
+            <td data-grid-enemy="4,1" onclick="shoot(4,1)"></td>
+            <td data-grid-enemy="5,1" onclick="shoot(5,1)"></td>
+            <td data-grid-enemy="6,1" onclick="shoot(6,1)"></td>
+            <td data-grid-enemy="7,1" onclick="shoot(7,1)"></td>
+            <td data-grid-enemy="8,1" onclick="shoot(8,1)"></td>
+            <td data-grid-enemy="9,1" onclick="shoot(9,1)"></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td data-grid-enemy="0,2" onclick="shoot(0,2)"></td>
+            <td data-grid-enemy="1,2" onclick="shoot(1,2)"></td>
+            <td data-grid-enemy="2,2" onclick="shoot(2,2)"></td>
+            <td data-grid-enemy="3,2" onclick="shoot(3,2)"></td>
+            <td data-grid-enemy="4,2" onclick="shoot(4,2)"></td>
+            <td data-grid-enemy="5,2" onclick="shoot(5,2)"></td>
+            <td data-grid-enemy="6,2" onclick="shoot(6,2)"></td>
+            <td data-grid-enemy="7,2" onclick="shoot(7,2)"></td>
+            <td data-grid-enemy="8,2" onclick="shoot(8,2)"></td>
+            <td data-grid-enemy="9,2" onclick="shoot(9,2)"></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td data-grid-enemy="0,3" onclick="shoot(0,3)"></td>
+            <td data-grid-enemy="1,3" onclick="shoot(1,3)"></td>
+            <td data-grid-enemy="2,3" onclick="shoot(2,3)"></td>
+            <td data-grid-enemy="3,3" onclick="shoot(3,3)"></td>
+            <td data-grid-enemy="4,3" onclick="shoot(4,3)"></td>
+            <td data-grid-enemy="5,3" onclick="shoot(5,3)"></td>
+            <td data-grid-enemy="6,3" onclick="shoot(6,3)"></td>
+            <td data-grid-enemy="7,3" onclick="shoot(7,3)"></td>
+            <td data-grid-enemy="8,3" onclick="shoot(8,3)"></td>
+            <td data-grid-enemy="9,3" onclick="shoot(9,3)"></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td data-grid-enemy="0,4" onclick="shoot(0,4)"></td>
+            <td data-grid-enemy="1,4" onclick="shoot(1,4)"></td>
+            <td data-grid-enemy="2,4" onclick="shoot(2,4)"></td>
+            <td data-grid-enemy="3,4" onclick="shoot(3,4)"></td>
+            <td data-grid-enemy="4,4" onclick="shoot(4,4)"></td>
+            <td data-grid-enemy="5,4" onclick="shoot(5,4)"></td>
+            <td data-grid-enemy="6,4" onclick="shoot(6,4)"></td>
+            <td data-grid-enemy="7,4" onclick="shoot(7,4)"></td>
+            <td data-grid-enemy="8,4" onclick="shoot(8,4)"></td>
+            <td data-grid-enemy="9,4" onclick="shoot(9,4)"></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td data-grid-enemy="0,5" onclick="shoot(0,5)"></td>
+            <td data-grid-enemy="1,5" onclick="shoot(1,5)"></td>
+            <td data-grid-enemy="2,5" onclick="shoot(2,5)"></td>
+            <td data-grid-enemy="3,5" onclick="shoot(3,5)"></td>
+            <td data-grid-enemy="4,5" onclick="shoot(4,5)"></td>
+            <td data-grid-enemy="5,5" onclick="shoot(5,5)"></td>
+            <td data-grid-enemy="6,5" onclick="shoot(6,5)"></td>
+            <td data-grid-enemy="7,5" onclick="shoot(7,5)"></td>
+            <td data-grid-enemy="8,5" onclick="shoot(8,5)"></td>
+            <td data-grid-enemy="9,5" onclick="shoot(9,5)"></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td data-grid-enemy="0,6" onclick="shoot(0,6)"></td>
+            <td data-grid-enemy="1,6" onclick="shoot(1,6)"></td>
+            <td data-grid-enemy="2,6" onclick="shoot(2,6)"></td>
+            <td data-grid-enemy="3,6" onclick="shoot(3,6)"></td>
+            <td data-grid-enemy="4,6" onclick="shoot(4,6)"></td>
+            <td data-grid-enemy="5,6" onclick="shoot(5,6)"></td>
+            <td data-grid-enemy="6,6" onclick="shoot(6,6)"></td>
+            <td data-grid-enemy="7,6" onclick="shoot(7,6)"></td>
+            <td data-grid-enemy="8,6" onclick="shoot(8,6)"></td>
+            <td data-grid-enemy="9,6" onclick="shoot(9,6)"></td>
+          </tr>
+          <tr>
+            <td>7</td>
+            <td data-grid-enemy="0,7" onclick="shoot(0,7)"></td>
+            <td data-grid-enemy="1,7" onclick="shoot(1,7)"></td>
+            <td data-grid-enemy="2,7" onclick="shoot(2,7)"></td>
+            <td data-grid-enemy="3,7" onclick="shoot(3,7)"></td>
+            <td data-grid-enemy="4,7" onclick="shoot(4,7)"></td>
+            <td data-grid-enemy="5,7" onclick="shoot(5,7)"></td>
+            <td data-grid-enemy="6,7" onclick="shoot(6,7)"></td>
+            <td data-grid-enemy="7,7" onclick="shoot(7,7)"></td>
+            <td data-grid-enemy="8,7" onclick="shoot(8,7)"></td>
+            <td data-grid-enemy="9,7" onclick="shoot(9,7)"></td>
+          </tr>
+          <tr>
+            <td>8</td>
+            <td data-grid-enemy="0,8" onclick="shoot(0,8)"></td>
+            <td data-grid-enemy="1,8" onclick="shoot(1,8)"></td>
+            <td data-grid-enemy="2,8" onclick="shoot(2,8)"></td>
+            <td data-grid-enemy="3,8" onclick="shoot(3,8)"></td>
+            <td data-grid-enemy="4,8" onclick="shoot(4,8)"></td>
+            <td data-grid-enemy="5,8" onclick="shoot(5,8)"></td>
+            <td data-grid-enemy="6,8" onclick="shoot(6,8)"></td>
+            <td data-grid-enemy="7,8" onclick="shoot(7,8)"></td>
+            <td data-grid-enemy="8,8" onclick="shoot(8,8)"></td>
+            <td data-grid-enemy="9,8" onclick="shoot(9,8)"></td>
+          </tr>
+          <tr>
+            <td>9</td>
+            <td data-grid-enemy="0,9" onclick="shoot(0,9)"></td>
+            <td data-grid-enemy="1,9" onclick="shoot(1,9)"></td>
+            <td data-grid-enemy="2,9" onclick="shoot(2,9)"></td>
+            <td data-grid-enemy="3,9" onclick="shoot(3,9)"></td>
+            <td data-grid-enemy="4,9" onclick="shoot(4,9)"></td>
+            <td data-grid-enemy="5,9" onclick="shoot(5,9)"></td>
+            <td data-grid-enemy="6,9" onclick="shoot(6,9)"></td>
+            <td data-grid-enemy="7,9" onclick="shoot(7,9)"></td>
+            <td data-grid-enemy="8,9" onclick="shoot(8,9)"></td>
+            <td data-grid-enemy="9,9" onclick="shoot(9,9)"></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="ui small feed">
+        <h4 class="ui header">Ned vs John</h4>
+        <div class="event">
+          <div class="content">
+            <div class="summary">
+              John has joined the game.
+              <div class="date">Today</div>
+            </div>
+          </div>
+        </div>
+        <div class="event">
+          <div class="content">
+            <div class="summary">
+              Ned has joined the game.
+              <div class="date">Today</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <br><br>
+  <p>Made by eknowles</p>
+  <br>
+</div>
+</body>
+</html>
